@@ -1,0 +1,58 @@
+---
+// src/layouts/MainLayout.astro
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css'; // File CSS Tailwind
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title} - SMA ABBS Surakarta</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style is:global>
+        /* CSS Tambahan untuk hal-hal yang ribet di Tailwind */
+        body { font-family: 'Montserrat', sans-serif; }
+        
+        /* Custom Maroon - Biar konsisten dengan desain Bapak */
+        .text-maroon { color: #800000; }
+        .bg-maroon { background-color: #800000; }
+        
+        /* Animation Classes */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .logo-scroll-wrapper {
+            display: flex;
+            width: max-content;
+            animation: scroll 40s linear infinite;
+        }
+        .logo-scroll-wrapper:hover { animation-play-state: paused; }
+        
+        .play-btn:hover { transform: scale(1.1); }
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800 m-0 p-0 overflow-x-hidden">
+
+    <Navbar />
+
+    <slot />
+
+    <Footer />
+
+</body>
+</html>

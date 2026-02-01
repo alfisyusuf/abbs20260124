@@ -1,0 +1,393 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { sanityClient } from "sanity:client";
+import { createImageUrlBuilder } from "@sanity/image-url";
+
+// --- 1. FETCH DATA (Home + News) ---
+const data = await sanityClient.fetch(`{
+  "home": *[_type == "homePage"][0],
+  "posts": *[_type == "post"] | order(publishedAt desc)[0..3] {
+    title, slug, publishedAt, category, mainImage
+  }
+}`);
+
+const { home, posts } = data;
+const builder = createImageUrlBuilder(sanityClient);
+
+// Helper Image
+function urlFor(source) {
+  if (!source) return 'https://placehold.co/800x600?text=No+Image';
+  return builder.image(source).auto('format');
+}
+
+// Helper Date
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleDateString('id-ID', { month: 'short' }).toUpperCase().replace('.', '');
+    return `${day} ${month}`;
+}
+---
+
+<MainLayout title="Home - SMA ABBS Surakarta">
+
+    <div class="relative w-full h-screen overflow-hidden">
+        <img src={home?.heroImage ? urlFor(home.heroImage).url() : "https://images.unsplash.com/photo-1564981797816-1043664bf78d"} 
+             alt="Hero Background" 
+             class="absolute inset-0 w-full h-full object-cover z-0">
+        
+        <div class="absolute inset-0 bg-gray-900/40 z-10"></div>
+
+        <div class="absolute top-16 left-1/2 transform -translate-x-1/2 z-40 text-center w-full px-4">
+            <img src="/logoabbsputih.png" onerror="this.src='https://placehold.co/100x100?text=Logo'" alt="Logo" class="h-16 mx-auto drop-shadow-lg mb-2">
+            <h1 class="text-xs tracking-[0.2em] font-light uppercase text-white shadow-black drop-shadow-md">
+                SMA ABBS Surakarta
+            </h1>
+        </div>
+
+        <div class="absolute inset-0 flex flex-col justify-center items-center z-30 pt-20">
+            <h2 class="text-5xl md:text-7xl font-light text-white mb-6 drop-shadow-lg tracking-wide uppercase text-center">
+                {home?.heroTitle || 'Excellence'}
+            </h2>
+            
+            {/* Tombol Play memicu Lightbox */}
+            <button class="play-btn w-20 h-20 rounded-full border-2 border-white flex items-center justify-center text-white backdrop-blur-sm bg-white/10 transition duration-300 group cursor-pointer"
+                    onclick={`openLightbox('${home?.heroVideoLink || "#"}')`}>
+                <i class="fa-solid fa-play ml-1 text-2xl group-hover:text-gray-200"></i>
+            </button>
+        </div>
+
+        <div class="absolute bottom-0 right-0 z-40 w-full md:w-[450px]">
+            <div class="glass-panel p-8 md:p-12 text-white bg-black/75 backdrop-blur-md">
+                <p class="text-xs font-bold text-gray-300 tracking-widest mb-2 uppercase">
+                    Wujudkan Potensi Terbaik
+                </p>
+                <h3 class="text-2xl font-bold mb-4 uppercase leading-tight text-white">
+                    {home?.ppdbTitle || 'PPDB TAHUN AJARAN BARU'}
+                </h3>
+                <p class="text-sm text-gray-200 leading-relaxed mb-6 font-light border-l-2 border-yellow-500 pl-4">
+                    {home?.ppdbText || 'Bergabunglah bersama kami.'}
+                </p>
+                <a href={home?.ppdbLink || '#'} class="inline-flex items-center text-sm font-bold border-b border-white pb-1 hover:text-yellow-400 hover:border-yellow-400 transition">
+                    Informasi Selengkapnya <i class="fa-solid fa-chevron-right ml-2 text-xs"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 animate-bounce">
+            <i class="fa-solid fa-chevron-down text-white text-2xl"></i>
+        </div>
+    </div>
+
+    <section class="relative bg-white py-24 md:py-32 overflow-hidden">
+        <div class="absolute top-10 left-0 text-[10rem] md:text-[15rem] font-bold text-gray-50 opacity-[0.03] pointer-events-none select-none leading-none z-0">
+            LEADER
+        </div>
+        
+        <div class="container mx-auto px-6 md:px-12 relative z-10">
+            <div class="flex flex-col md:flex-row items-center relative">
+                
+                <div class="w-full md:w-3/5 z-20 relative pt-10 md:pt-0">
+                    <div class="bg-white p-8 md:p-16 shadow-2xl border-l-8 border-[#800000] relative">
+                        <i class="fa-solid fa-quote-right text-6xl text-gray-100 absolute top-4 right-4 -z-10"></i>
+                        <h4 class="text-xs font-bold text-[#800000] tracking-[0.3em] uppercase mb-4 flex items-center gap-2">
+                            <span class="w-8 h-px bg-[#800000]"></span> Principal's Message
+                        </h4>
+                        
+                        <h2 class="text-4xl md:text-5xl font-light text-gray-900 mb-8 leading-tight">
+                            Mendidik dengan <br>
+                            <span class="font-bold relative inline-block">
+                                Hati & Teknologi
+                                <span class="absolute bottom-2 left-0 w-full h-3 bg-yellow-400/40 -z-10"></span>
+                            </span>
+                        </h2>
+                        
+                        <div class="text-gray-600 leading-relaxed mb-8 text-lg font-light">
+                            {home?.principalMessage || "Pesan kepsek belum diisi."}
+                        </div>
+
+                        <div class="flex items-center justify-between border-t border-gray-100 pt-6">
+                            <div>
+                                <p class="font-bold text-gray-900 text-xl font-serif">{home?.principalName || 'Nama Kepsek'}</p>
+                                <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Kepala Sekolah SMA ABBS</p>
+                            </div>
+                            <div class="font-serif italic text-3xl text-gray-300 select-none">Signature</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 md:-ml-20 mt-10 md:mt-0 z-10 relative">
+                    <div class="relative h-[600px] w-full overflow-hidden shadow-lg bg-gray-200">
+                        <img src={home?.principalPhoto ? urlFor(home.principalPhoto).url() : "https://placehold.co/600x800"} 
+                             alt="Kepala Sekolah" 
+                             class="w-full h-full object-cover transition duration-1000 ease-in-out hover:scale-105">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-gray-50 min-h-screen flex flex-col justify-center py-20 border-t border-gray-200 relative"> 
+        <div class="container mx-auto px-6 md:px-12 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div class="max-w-2xl">
+                    <h4 class="text-xs font-bold text-[#800000] tracking-[0.3em] uppercase mb-4 pl-4 border-l-4 border-[#800000]">Core Curriculum</h4>
+                    <h2 class="text-4xl md:text-5xl font-light text-gray-900 leading-tight">
+                        Three Pillars of <br><span class="font-bold text-[#800000]">Excellence</span>
+                    </h2>
+                </div>
+                <div class="hidden md:block w-32 h-px bg-[#800000] mb-4"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-gray-200 shadow-2xl bg-white">
+                {home?.curriculum?.map((item, index) => (
+                    <div class="group relative h-[600px] md:h-[70vh] border-r border-gray-200 overflow-hidden cursor-pointer">
+                        <img src={item.image ? urlFor(item.image).url() : "https://placehold.co/600x800"} 
+                             class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                        
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90"></div>
+                        <div class={`absolute inset-0 ${item.color || 'bg-maroon/80'} opacity-0 group-hover:opacity-90 transition-opacity duration-500`}></div>
+                        
+                        <div class="absolute inset-0 flex flex-col justify-end p-8 md:p-12 transition-transform duration-500 group-hover:-translate-y-4">
+                            <span class="text-6xl md:text-8xl font-bold text-white/20 absolute top-6 left-6">0{index + 1}</span>
+                            <div class="w-12 h-1 bg-white mb-6 group-hover:w-24 transition-all duration-500"></div>
+                            <h3 class="text-2xl md:text-3xl font-bold text-white mb-2 uppercase tracking-wider">{item.title}</h3>
+                            <div class="block mt-2">
+                                <p class="text-gray-200 text-sm leading-relaxed mb-6 font-light line-clamp-3">{item.desc}</p>
+                                <span class="text-xs font-bold text-white uppercase tracking-widest border-b border-white pb-1 inline-block">Explore Curriculum</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-[#800000] py-20 relative">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="container mx-auto px-6 md:px-12 relative z-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/20">
+                {home?.stats?.map((stat) => (
+                    <div class="px-4 md:px-8 text-center group mb-8 md:mb-0">
+                        <h3 class="text-4xl md:text-6xl font-light text-white mb-2">{stat.value}</h3>
+                        <p class="text-xs text-red-100 tracking-[0.2em] uppercase mt-2">{stat.label}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-white py-12 border-b border-gray-100 overflow-hidden">
+        <div class="container mx-auto px-6 mb-8 text-center">
+             <p class="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase">Alumni Kami Diterima Di</p>
+        </div>
+        <div class="logo-scroll-container">
+            <div class="logo-scroll-wrapper gap-16 items-center opacity-60 grayscale hover:grayscale-0 transition duration-500">
+                {/* Duplikat array agar scrolling infinite seamless */}
+                {home?.alumniLogos?.concat(home.alumniLogos).map((logo) => (
+                    <img src={urlFor(logo).height(80).url()} class="h-16 w-auto object-contain" alt="Univ Logo">
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-[#f8f9fa] py-20">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="flex justify-between items-end mb-12">
+                <div>
+                    <h4 class="text-xs font-bold text-[#800000] tracking-widest uppercase mb-2">Learning Experience</h4>
+                    <h2 class="text-3xl md:text-4xl font-light text-gray-900">Suasana Belajar <span class="font-bold text-[#800000]">Interaktif</span></h2>
+                </div>
+                <a href="#" class="hidden md:flex items-center gap-3 text-sm text-gray-500 hover:text-[#800000] transition font-semibold">
+                    Lihat Kanal Youtube <i class="fa-brands fa-youtube text-red-600"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {home?.learningVideos?.map((video) => (
+                    <div class="group relative rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+                         onclick={`openLightbox('${video.videoUrl}')`}>
+                        <img src={video.thumbnail ? urlFor(video.thumbnail).width(600).height(400).url() : "https://placehold.co/600x400"} 
+                             class="w-full h-64 object-cover transform transition duration-700 group-hover:scale-105">
+                        
+                        <div class="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/10 transition">
+                            <div class="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center text-white backdrop-blur-sm bg-white/10 transition duration-300 group-hover:scale-110 group-hover:bg-white/20">
+                                <i class="fa-solid fa-play ml-1 text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-6 pt-12">
+                            <span class={`text-[10px] ${video.colorClass || 'bg-red-700'} text-white px-2 py-1 font-bold uppercase tracking-wider`}>
+                                {video.category}
+                            </span>
+                            <p class="font-bold mt-2 text-lg text-white">{video.title}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    {home?.testimonials && home.testimonials.length > 0 && (
+    <section class="relative bg-[#0b0f19] py-24 overflow-hidden">
+        <div class="absolute top-0 right-0 text-gray-800 opacity-20 text-[20rem] font-serif leading-none -mr-20 -mt-20 pointer-events-none select-none">”</div>
+        
+        <div class="container mx-auto px-6 md:px-12 relative z-10">
+            <div class="flex items-center gap-4 mb-12">
+                <div class="h-px w-12 bg-yellow-600"></div>
+                <span class="text-yellow-500 text-xs font-bold tracking-[0.3em] uppercase">Success Stories</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-5 relative group cursor-pointer">
+                    <div class="absolute top-4 -left-4 w-full h-full border border-yellow-600/30 z-0 hidden md:block"></div>
+                    <div class="relative overflow-hidden aspect-[3/4] shadow-2xl z-10 bg-black">
+                        <img src={home.testimonials[0].photo ? urlFor(home.testimonials[0].photo).url() : "https://placehold.co/400x600"} 
+                             class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-700 ease-out">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 w-full p-8">
+                            <p class="text-yellow-500 text-xs font-bold uppercase tracking-wider mb-1">{home.testimonials[0].batch || 'Alumni'}</p>
+                            <h3 class="text-white text-2xl font-bold uppercase leading-none">{home.testimonials[0].name}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 relative text-left">
+                    <h2 class="text-3xl md:text-5xl text-white font-light leading-tight mb-8">
+                        "{home.testimonials[0].quote}"
+                    </h2>
+                    <div class="flex items-center gap-6 mb-10 border-l-4 border-[#800000] pl-6">
+                        <div>
+                            <h4 class="text-white text-xl font-bold uppercase tracking-wide">{home.testimonials[0].name}</h4>
+                            <p class="text-gray-400 text-sm mt-1">Diterima di <span class="text-yellow-500 font-semibold">{home.testimonials[0].univ}</span></p>
+                        </div>
+                        {home.testimonials[0].univLogo && (
+                            <img src={urlFor(home.testimonials[0].univLogo).url()} class="h-12 w-auto opacity-70 grayscale hover:grayscale-0 transition">
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    )}
+
+    <section class="bg-white py-20">
+        <div class="container mx-auto px-6 md:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+                <div>
+                    <h4 class="text-xs font-bold text-yellow-600 tracking-widest uppercase mb-2">Journal</h4>
+                    <h2 class="text-3xl md:text-4xl font-light text-[#800000]">Latest <span class="font-bold">Updates</span></h2>
+                </div>
+                <a href="/news" class="hidden md:flex items-center gap-3 text-sm text-gray-500 hover:text-[#800000] transition font-semibold">
+                    View All Posts <i class="fa-solid fa-arrow-right text-yellow-600"></i>
+                </a>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {posts.map((post) => (
+                    <article class="group cursor-pointer">
+                        <div class="relative overflow-hidden mb-5 rounded-sm shadow-sm group-hover:shadow-md transition-all duration-300">
+                            <img src={post.mainImage ? urlFor(post.mainImage).width(600).height(400).url() : "https://placehold.co/600x400"} 
+                                 class="w-full h-64 object-cover transform transition duration-700 group-hover:scale-110">
+                            <div class="absolute top-0 left-0 bg-[#800000] text-white text-xs font-bold px-4 py-2">
+                                {formatDate(post.publishedAt)}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-blue-700 uppercase tracking-wider mb-2 block">{post.category || 'Berita'}</span>
+                            <a href={`/news/${post.slug.current}`}>
+                                <h3 class="text-xl text-[#800000] font-bold leading-tight mb-3 group-hover:text-yellow-600 transition">{post.title}</h3>
+                            </a>
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </div>
+    </section>
+
+    <section class="relative bg-[#800000] py-20 overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 30px 30px;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-500/20 blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <p class="text-yellow-400 text-xs font-bold tracking-[0.3em] uppercase mb-4">Penerimaan Peserta Didik Baru</p>
+            <h2 class="text-3xl md:text-5xl font-light text-white mb-6">
+                {home?.ctaTitle || 'Mulai Perjalanan Masa Depan Bersama Kami'}
+            </h2>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-5 mt-10">
+                <a href={home?.ctaLink || '#'} class="px-8 py-4 bg-yellow-500 text-[#800000] font-bold text-sm tracking-widest uppercase hover:bg-yellow-400 hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all duration-300 rounded-sm">
+                    Daftar Sekarang
+                </a>
+                <a href="#" class="px-8 py-4 border border-red-300 text-red-100 font-bold text-sm tracking-widest uppercase hover:border-white hover:text-white hover:bg-white/5 transition-colors duration-300 rounded-sm">
+                    Unduh Panduan
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <div id="videoLightbox" class="fixed inset-0 z-[100] hidden bg-black/90 flex items-center justify-center p-4">
+        <div class="relative w-full max-w-5xl aspect-video bg-black shadow-2xl">
+            <button onclick="closeLightbox()" class="absolute -top-10 right-0 text-white hover:text-red-500 text-3xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <iframe id="lightboxIframe" class="w-full h-full" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <script is:inline>
+        // Fungsi Buka Lightbox
+        function openLightbox(videoUrl) {
+            if (!videoUrl || videoUrl === '#') {
+                alert("Link video belum diisi di Sanity.");
+                return;
+            }
+            
+            // Konversi link youtube biasa ke embed jika perlu
+            let embedUrl = videoUrl;
+            if (videoUrl.includes('watch?v=')) {
+                embedUrl = videoUrl.replace('watch?v=', 'embed/');
+            } else if (videoUrl.includes('youtu.be/')) {
+                embedUrl = videoUrl.replace('youtu.be/', 'youtube.com/embed/');
+            }
+
+            const lightbox = document.getElementById('videoLightbox');
+            const iframe = document.getElementById('lightboxIframe');
+            
+            // Tambah autoplay agar langsung main
+            iframe.src = embedUrl + "?autoplay=1";
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+        }
+
+        // Fungsi Tutup Lightbox
+        function closeLightbox() {
+            const lightbox = document.getElementById('videoLightbox');
+            const iframe = document.getElementById('lightboxIframe');
+            
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            iframe.src = ""; // Matikan video
+        }
+
+        // Tutup jika klik di luar video
+        document.getElementById('videoLightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'videoLightbox') {
+                closeLightbox();
+            }
+        });
+    </script>
+
+    <style>
+        /* CSS KHUSUS HALAMAN INI */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .logo-scroll-container { width: 100%; overflow: hidden; }
+        .logo-scroll-wrapper { display: flex; width: max-content; animation: scroll 40s linear infinite; }
+        .logo-scroll-wrapper:hover { animation-play-state: paused; }
+        
+        .play-btn:hover { transform: scale(1.1); }
+    </style>
+
+</MainLayout>

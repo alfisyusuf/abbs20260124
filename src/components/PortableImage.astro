@@ -1,0 +1,47 @@
+---
+import { sanityClient } from "sanity:client";
+import { createImageUrlBuilder } from "@sanity/image-url";
+
+const { node } = Astro.props;
+
+let url = null;
+let errorMsg = null;
+
+try {
+  // 1. Cek apakah node ada
+  if (!node) {
+    errorMsg = "Data Node Kosong";
+  } 
+  // 2. Cek apakah asset ada
+  else if (!node.asset) {
+    errorMsg = "Node ditemukan, tapi Asset/Gambar kosong (belum terpublish?)";
+    console.log("Debug Node:", JSON.stringify(node, null, 2));
+  } 
+  // 3. Coba buat URL
+  else {
+    const builder = createImageUrlBuilder(sanityClient);
+    url = builder.image(node).width(800).fit('max').auto('format').url();
+  }
+} catch (err) {
+  errorMsg = "Error Builder: " + err.message;
+}
+---
+
+{errorMsg ? (
+  <div class="my-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded text-center">
+    <p class="font-bold">⚠️ Gagal Memuat Gambar</p>
+    <code class="text-xs block mt-1">{errorMsg}</code>
+  </div>
+) : (
+  <figure class="my-8">
+      <img src={url} 
+           alt={node.alt || "Gambar Ilustrasi"} 
+           class="w-full h-auto rounded-lg shadow-md object-cover" />
+      
+      {node.caption && (
+          <figcaption class="text-center text-sm text-gray-500 mt-2 italic font-serif">
+              {node.caption}
+          </figcaption>
+      )}
+  </figure>
+)}

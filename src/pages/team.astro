@@ -1,0 +1,123 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { sanityClient } from "sanity:client";
+import { createImageUrlBuilder } from "@sanity/image-url";
+
+// 1. FETCH DATA (Header Page + List Guru)
+const data = await sanityClient.fetch(`{
+  "page": *[_type == "pageTeam"][0],
+  "team": *[_type == "team"] | order(order asc) {
+    name, role, photo, educationDegree, university, email, linkedin
+  }
+}`);
+
+const { page, team } = data;
+const builder = createImageUrlBuilder(sanityClient);
+
+// PERBAIKAN FUNGSI URLFOR
+// Sekarang fungsi ini mengembalikan 'Builder', bukan 'String URL'
+function urlFor(source) {
+  return builder.image(source).auto('format');
+}
+---
+
+<MainLayout title="Guru & Staf">
+
+    <header class="relative w-full h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-[#0b0f19]">
+        <img src={page?.heroImage ? urlFor(page.heroImage).url() : "https://images.unsplash.com/photo-1524178232363-1fb2b075b655"} 
+             class="absolute inset-0 w-full h-full object-cover opacity-40">
+        
+        <div class="relative z-10 text-center px-4">
+            <p class="text-yellow-500 text-xs font-bold tracking-[0.3em] uppercase mb-4">
+                {page?.heroSubtitle || 'The Educators'}
+            </p>
+            <h1 class="text-4xl md:text-6xl font-light text-white uppercase tracking-wide">
+                {page?.heroTitle || 'Guru &'} <span class="font-bold text-[#800000]">{page?.heroTitleHighlight || 'Staf'}</span>
+            </h1>
+            <div class="w-24 h-1 bg-[#800000] mx-auto mt-6"></div>
+        </div>
+    </header>
+
+    <section class="py-20 md:py-28 bg-white">
+        <div class="container mx-auto px-6 md:px-12">
+            
+            <div class="max-w-3xl mx-auto text-center mb-20">
+                <p class="text-gray-600 leading-relaxed text-lg font-light">
+                    {page?.introText || 'Dibimbing oleh tenaga pendidik profesional.'}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                
+                {team.map((member) => {
+                    // LOGIKA GAMBAR: Cek apakah foto ada?
+                    // Jika ada: Resize jadi 400x533 (Rasio 3:4)
+                    // Jika tidak: Pakai placeholder
+                    const photoUrl = member.photo 
+                        ? urlFor(member.photo).width(400).height(533).fit('crop').url()
+                        : "https://placehold.co/400x533?text=No+Photo";
+
+                    return (
+                        <div class="group bg-white">
+                            <div class="card-img-wrapper relative overflow-hidden aspect-[3/4] bg-gray-200">
+                                <img src={photoUrl} 
+                                     alt={member.name}
+                                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                
+                                {/* OVERLAY HOVER: INFO ALMAMATER */}
+                                <div class="absolute inset-0 z-10 flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0">
+                                    
+                                    <p class="text-yellow-400 text-[10px] font-bold uppercase tracking-widest mb-2">Almamater</p>
+                                    
+                                    <p class="text-white text-lg font-bold leading-tight">{member.educationDegree || '-'}</p>
+                                    
+                                    <p class="text-gray-300 text-xs mt-1 mb-4">{member.university || '-'}</p>
+                                    
+                                    <div class="flex gap-3 pt-4 border-t border-white/20">
+                                        {member.email && (
+                                            <a href={`mailto:${member.email}`} class="text-white hover:text-yellow-400 transition"><i class="fa-solid fa-envelope"></i></a>
+                                        )}
+                                        {member.linkedin && (
+                                            <a href={member.linkedin} target="_blank" class="text-white hover:text-yellow-400 transition"><i class="fa-brands fa-linkedin"></i></a>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pt-6 text-center group-hover:text-left transition-all duration-300">
+                                <h3 class="text-xl font-bold text-gray-900 group-hover:text-[#800000] transition">{member.name}</h3>
+                                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">{member.role}</p>
+                                <div class="w-0 h-0.5 bg-[#800000] mt-3 transition-all duration-500 group-hover:w-12"></div>
+                            </div>
+                        </div>
+                    );
+                })}
+
+            </div>
+
+            {team.length === 0 && (
+                <div class="text-center py-10 text-gray-400 italic">Belum ada data guru. Silakan input di Sanity Studio.</div>
+            )}
+            
+        </div>
+    </section>
+
+    <style>
+        .card-img-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, #800000 10%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+        .group:hover .card-img-wrapper::after {
+            opacity: 0.95;
+        }
+    </style>
+
+</MainLayout>

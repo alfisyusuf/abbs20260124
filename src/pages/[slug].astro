@@ -1,0 +1,169 @@
+---
+import MainLayout from '../layouts/MainLayout.astro';
+import { sanityClient } from "sanity:client";
+import { PortableText } from "astro-portabletext";
+import { createImageUrlBuilder } from "@sanity/image-url";
+import PortableImage from '../components/PortableImage.astro';
+
+import StyleLead from '../components/portabletext/StyleLead.astro';
+import StyleQuote from '../components/portabletext/StyleQuote.astro';
+import MarkLink from '../components/portabletext/MarkLink.astro';
+import TypeTable from '../components/portabletext/TypeTable.astro';
+
+// 1. GET STATIC PATHS (Ambil semua slug page)
+export async function getStaticPaths() {
+  const pages = await sanityClient.fetch(`*[_type == "page"] { slug }`);
+  return pages.map((page) => ({ params: { slug: page.slug.current } }));
+}
+
+// 2. AMBIL DATA PAGE + SETTINGS GLOBAL (Updated)
+const { slug } = Astro.params;
+const data = await sanityClient.fetch(`{
+  "page": *[_type == "page" && slug.current == $slug][0],
+  "settings": *[_type == "siteSettings"][0] {
+    sidebarMenu, 
+    brochureTitle, brochureSubtitle, brochureLink, brochureButtonText, brochureIcon
+  }
+}`, { slug });
+
+const { page, settings } = data; // Destructure data
+
+if (!page) return Astro.redirect('/404');
+
+// 3. SETUP GAMBAR
+const builder = createImageUrlBuilder(sanityClient);
+function urlFor(source) {
+  if (!source) return 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1469'; // Gambar default jika kosong
+  return builder.image(source).auto('format').url();
+}
+
+// 4. SETUP KOMPONEN RICH TEXT
+const components = {
+  block: {
+    lead: StyleLead,
+    blockquote: StyleQuote,
+  },
+  marks: {
+    link: MarkLink,
+  },
+  type: {
+    image: PortableImage,
+    table: TypeTable,
+  }
+};
+---
+
+<MainLayout title={page.title}>
+    
+    <header class="relative w-full h-[400px] flex items-center justify-center overflow-hidden bg-[#0b0f19]">
+        <img src={urlFor(page.heroImage)} 
+             class="absolute inset-0 w-full h-full object-cover opacity-40">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+
+        <div class="relative z-10 text-center px-4 mt-16">
+            <p class="text-yellow-500 text-xs font-bold tracking-[0.2em] uppercase mb-3">
+                Home <span class="mx-2 text-gray-500">/</span> Profil
+            </p>
+            
+            <h1 class="text-4xl md:text-5xl font-bold text-white leading-tight drop-shadow-lg">
+                {page.title}
+            </h1>
+        </div>
+    </header>
+
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-6 md:px-12">
+            
+            <div class="flex flex-col lg:flex-row gap-12">
+                
+                <div class="w-full lg:w-8/12">
+                    <div class="content-body font-['Montserrat'] text-gray-600 leading-relaxed">
+                        <div class="prose prose-lg max-w-none prose-headings:text-[#111827] prose-headings:font-bold prose-p:text-gray-600 prose-a:text-[#800000] prose-li:text-gray-600">
+                            <PortableText value={page.body} components={components} />
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="w-full lg:w-4/12 space-y-8">
+                    
+                    <div class="bg-gray-50 p-8 border border-gray-100 rounded-sm sticky top-32">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Tentang Kami</h4>
+                        
+                        {settings?.sidebarMenu && (
+                            <ul class="space-y-3">
+                                {settings.sidebarMenu.map((item) => {
+                                    // Logika Active State: Cek apakah Link Menu sama dengan URL halaman saat ini
+                                    // Kita buang tanda '/' di depan link menu untuk pencocokan yang akurat dengan 'slug'
+                                    const cleanMenuLink = item.url.replace(/^\//, ''); 
+                                    const isActive = cleanMenuLink === slug;
+
+                                    return (
+                                        <li>
+                                            <a href={item.url} class={`block pl-4 border-l-2 transition text-sm ${isActive ? 'border-[#800000] text-[#800000] font-bold' : 'border-transparent text-gray-600 hover:text-[#800000] hover:border-gray-300'}`}>
+                                                {item.title}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        )}
+
+                        {settings?.brochureLink && (
+                            <div class="mt-8 bg-[#800000] p-6 rounded-sm text-center relative overflow-hidden group">
+                                
+                                {/* PERBAIKAN 1: Tambah 'pointer-events-none' agar background tidak menghalangi klik */}
+                                <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
+                                
+                                {/* PERBAIKAN 2: Bungkus semua konten dengan 'relative z-10' agar naik ke atas */}
+                                <div class="relative z-10">
+                                    {/* Logika Ikon */}
+                                    <div class="text-3xl text-yellow-500 mb-3">
+                                        {(!settings.brochureIcon || settings.brochureIcon === 'pdf') && <i class="fa-solid fa-file-pdf"></i>}
+                                        {settings.brochureIcon === 'whatsapp' && <i class="fa-brands fa-whatsapp"></i>}
+                                        {settings.brochureIcon === 'link' && <i class="fa-solid fa-link"></i>}
+                                        {settings.brochureIcon === 'download' && <i class="fa-solid fa-cloud-arrow-down"></i>}
+                                    </div>
+
+                                    <h3 class="text-white font-bold text-sm mb-1">{settings.brochureTitle}</h3>
+                                    <p class="text-white/70 text-[10px] mb-4 leading-relaxed">{settings.brochureSubtitle}</p>
+                                    
+                                    <a href={settings.brochureLink} target="_blank" class="inline-block w-full py-2 bg-yellow-500 text-[#800000] font-bold text-[10px] uppercase tracking-widest hover:bg-white transition rounded-sm cursor-pointer z-20">
+                                        {settings.brochureButtonText}
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                </aside>
+
+            </div>
+        </div>
+    </section>
+
+    <style is:global>
+        /* Memaksa List Bullet jadi Checklist Maroon sesuai request */
+        .content-body ul { 
+            list-style-type: none !important; 
+            margin-bottom: 1.5rem; 
+            padding-left: 0 !important;
+        }
+        .content-body ul li { 
+            position: relative; 
+            padding-left: 2rem; 
+            margin-bottom: 0.75rem; 
+        }
+        .content-body ul li::before { 
+            content: '\f058'; /* Icon FontAwesome Check Circle */
+            font-family: 'Font Awesome 6 Free'; 
+            font-weight: 900;
+            color: #800000; 
+            position: absolute; 
+            left: 0; 
+            top: 3px;
+            font-size: 1.1em;
+        }
+    </style>
+
+</MainLayout>

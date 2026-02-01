@@ -1,0 +1,8 @@
+---
+const { value } = Astro.props;
+const rel = !value.href.startsWith('/') ? 'noreferrer noopener' : undefined;
+const target = value.blank ? '_blank' : undefined;
+---
+<a href={value.href} target={target} rel={rel} class="text-[#800000] underline hover:text-yellow-600">
+    <slot />
+</a>

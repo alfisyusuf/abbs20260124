@@ -1,0 +1,27 @@
+---
+// src/components/Navbar.astro
+---
+<nav class="absolute top-0 left-0 w-full z-50 flex justify-between items-start font-['Montserrat']">
+    <div class="flex items-stretch">
+        <button class="bg-white text-gray-900 px-6 py-4 flex items-center gap-2 hover:bg-gray-100 transition rounded-none cursor-pointer">
+            <i class="fa-solid fa-bars text-xl"></i>
+            <span class="font-bold tracking-widest text-sm">MENU</span>
+        </button>
+        
+        <a href="/" class="bg-[#800000] text-white px-8 py-4 flex items-center font-bold tracking-widest text-sm hover:bg-[#600000] transition rounded-none">
+            DAFTAR
+        </a>
+    </div>
+
+    <div class="hidden md:flex items-center gap-6 px-8 py-4 text-white">
+        <a href="#" class="hover:text-yellow-500 transition"><i class="fa-brands fa-whatsapp text-xl"></i></a>
+        <a href="#" class="hover:text-yellow-500 transition"><i class="fa-brands fa-instagram text-xl"></i></a>
+        <a href="#" class="hover:text-yellow-500 transition"><i class="fa-brands fa-youtube text-xl"></i></a>
+        
+        <div class="h-4 w-px bg-white/50 mx-2"></div> 
+        
+        <a href="#" class="flex items-center gap-2 font-light text-sm hover:text-yellow-500 transition">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </a>
+    </div>
+</nav>

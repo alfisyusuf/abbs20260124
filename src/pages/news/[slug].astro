@@ -1,0 +1,285 @@
+---
+import MainLayout from '../../layouts/MainLayout.astro';
+import { sanityClient } from "sanity:client";
+import { PortableText } from "astro-portabletext";
+import { createImageUrlBuilder } from "@sanity/image-url";
+import PortableImage from '../../components/PortableImage.astro';
+import StyleLead from '../../components/portabletext/StyleLead.astro';
+import StyleQuote from '../../components/portabletext/StyleQuote.astro';
+import MarkLink from '../../components/portabletext/MarkLink.astro';
+import TypeTable from '../../components/portabletext/TypeTable.astro';
+
+// 1. GET STATIC PATHS
+export async function getStaticPaths() {
+  const posts = await sanityClient.fetch(`*[_type == "post"] { slug }`);
+  return posts.map((post) => ({ params: { slug: post.slug.current } }));
+}
+
+// 2. AMBIL DATA BERITA UTAMA + BERITA LAIN (UNTUK SIDEBAR)
+const { slug } = Astro.params;
+
+// Query sedikit kompleks: Ambil berita saat ini DAN 3 berita lain untuk sidebar
+const data = await sanityClient.fetch(`{
+  "post": *[_type == "post" && slug.current == $slug][0] {
+    title, publishedAt, mainImage, body, category,
+    tags
+  },
+  "settings": *[_type == "siteSettings"][0] {
+    authorName, authorRole, authorImage,
+    sidebarTitle, sidebarSubtitle, sidebarButtonText, sidebarLink, sidebarImage
+  },
+  "related": *[_type == "post" && slug.current != $slug] | order(publishedAt desc)[0..2] {
+    title, slug, category, mainImage
+  }
+}`, { slug });
+
+const { post, settings, related } = data;
+if (!post) return Astro.redirect('/404');
+
+const titleLength = post.title.length;
+let titleSizeClass = "text-4xl md:text-6xl lg:text-7xl";
+
+if (titleLength > 50) {
+    titleSizeClass = "text-3xl md:text-5xl lg:text-6xl";
+}
+
+if (titleLength > 80) {
+    titleSizeClass = "text-2xl md:text-4xl lg:text-5xl";
+}
+
+// 3. HELPER GAMBAR & TANGGAL
+const builder = createImageUrlBuilder(sanityClient);
+function urlFor(source) {
+  if (!source) return 'https://placehold.co/1200x800?text=No+Image';
+  return builder.image(source).auto('format').url();
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'long', year: 'numeric'
+    });
+}
+
+const components = {
+  // 1. Block Styles
+  block: {
+    lead: StyleLead,
+    blockquote: StyleQuote,
+  },
+  
+  // 2. Marks (Link, dll)
+  marks: {
+    link: MarkLink,
+  },
+
+  // 3. Types (Gambar & Tabel)
+  type: {
+    image: PortableImage,
+    table: TypeTable,
+  }
+};
+
+//Buat share
+const currentUrl = Astro.url.href; // URL lengkap halaman ini
+const encodedUrl = encodeURIComponent(currentUrl);
+const encodedTitle = encodeURIComponent(post.title);
+
+const shareLinks = {
+  facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+  whatsapp: `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`,
+  twitter: `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`,
+};
+---
+
+<MainLayout title={post.title}>
+    
+    <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-[#800000] z-[9999] w-0 transition-all duration-100"></div>
+    <script>
+        window.onscroll = function() {
+            var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            var scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        };
+    </script>
+
+    <header class="relative w-full h-[85vh] min-h-[600px]">
+        <img src={urlFor(post.mainImage)} 
+             alt={post.title} 
+             class="absolute inset-0 w-full h-full object-cover">
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-black/30"></div>
+
+        <div class="absolute bottom-0 left-0 w-full pb-32 px-6">
+            <div class="container mx-auto max-w-5xl">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="bg-[#800000] text-white px-4 py-2 font-bold text-xs uppercase tracking-[0.2em]">
+                        {post.category || 'News'}
+                    </span>
+                    <span class="text-gray-300 text-sm font-medium border-l border-gray-500 pl-4">
+                        {formatDate(post.publishedAt)}
+                    </span>
+                </div>
+
+                <h1 class={`${titleSizeClass} font-bold text-white leading-tight mb-8 drop-shadow-lg line-clamp-3`}>
+                    {post.title}
+                </h1>
+
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 border-2 border-white/50 overflow-hidden rounded-full">
+                        {/* Foto Penulis dari Global Settings (Fallback ke avatar default jika kosong) */}
+                        <img src={settings?.authorImage ? builder.image(settings.authorImage).width(100).height(100).url() : "https://ui-avatars.com/api/?name=Admin+ABBS&background=random"} 
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <p class="text-white font-bold text-sm uppercase tracking-wide">
+                            {settings?.authorName || 'Tim Humas'}
+                        </p>
+                        <p class="text-white/60 text-xs">
+                            {settings?.authorRole || 'SMA ABBS Surakarta'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="relative z-10 -mt-20 pb-20">
+        <div class="container mx-auto max-w-7xl px-4 md:px-6">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-16">
+
+                <div class="w-full lg:w-8/12">
+                    <div class="bg-white p-8 md:p-16 shadow-2xl border-t-8 border-[#800000]">
+                        
+                        <div class="flex lg:hidden gap-4 mb-8 pb-8 border-b border-gray-100">
+                            <span class="font-bold text-xs text-gray-400 uppercase tracking-widest">Share:</span>
+                            
+                            <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-blue-600 transition">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            
+                            <a href={shareLinks.whatsapp} target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-green-500 transition">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </a>
+
+                            <button class="copy-btn text-gray-400 hover:text-[#800000] transition" data-url={currentUrl}>
+                                <i class="fa-solid fa-link"></i>
+                            </button>
+                        </div>
+
+                        <div class="article-content drop-cap font-serif text-gray-700 text-lg leading-loose prose prose-headings:font-sans prose-headings:font-bold prose-headings:text-gray-900 prose-a:text-[#800000] max-w-none">
+                            <PortableText value={post.body} components={components} />
+                        </div>
+
+                        <div class="mt-16 pt-8 border-t border-gray-100">
+                            <div class="flex flex-wrap gap-3">
+                                <span class="py-2 text-xs font-bold text-gray-400 uppercase tracking-widest mr-2">Tags:</span>
+                                
+                                {/* LOGIKA TAGS DINAMIS */}
+                                {post.tags && post.tags.length > 0 ? (
+                                    post.tags.map((tag) => (
+                                        <span class="px-4 py-2 bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-widest hover:bg-[#800000] hover:text-white transition cursor-default">
+                                            {tag}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span class="text-xs text-gray-400 italic">Tidak ada tags</span>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <aside class="w-full lg:w-4/12 mt-12 lg:mt-0">
+                    <div class="sticky top-32 space-y-12">
+                        
+                        <div class="hidden lg:block">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Bagikan Artikel</h4>
+                            <div class="flex gap-2">
+                                <a href={shareLinks.facebook} target="_blank" rel="noopener noreferrer" class="w-12 h-12 border border-gray-300 flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:text-white transition">
+                                    <i class="fa-brands fa-facebook-f"></i>
+                                </a>
+                                
+                                <a href={shareLinks.whatsapp} target="_blank" rel="noopener noreferrer" class="w-12 h-12 border border-gray-300 flex items-center justify-center text-gray-400 hover:bg-green-500 hover:text-white transition">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </a>
+                                
+                                <button class="copy-btn w-12 h-12 border border-gray-300 flex items-center justify-center text-gray-400 hover:bg-[#800000] hover:text-white transition" data-url={currentUrl}>
+                                    <i class="fa-solid fa-link"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs font-bold text-[#800000] uppercase tracking-widest mb-6 border-b border-gray-200 pb-2">
+                                Baca Selanjutnya
+                            </h4>
+                            <div class="space-y-6">
+                                {related.map((item) => (
+                                    <a href={`/news/${item.slug.current}`} class="group flex gap-4 items-start">
+                                        <div class="w-24 h-24 flex-shrink-0 overflow-hidden bg-gray-200">
+                                            <img src={builder.image(item.mainImage).width(200).height(200).url()} 
+                                                 class="w-full h-full object-cover transition duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                        </div>
+                                        <div>
+                                            <span class="text-[10px] font-bold text-yellow-600 uppercase">{item.category || 'News'}</span>
+                                            <h5 class="text-sm font-bold text-gray-900 leading-snug mt-1 group-hover:text-[#800000] transition">
+                                                {item.title}
+                                            </h5>
+                                        </div>
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Hanya tampil jika Admin sudah mengisi Link di Settings */}
+                        {settings?.sidebarLink && (
+                            <a href={settings.sidebarLink} target="_blank" class="block bg-[#0b0f19] p-8 text-center relative overflow-hidden group cursor-pointer no-underline">
+                                
+                                {/* Gambar Background Dinamis */}
+                                <div class="absolute inset-0 opacity-20 transition duration-500 group-hover:scale-110" 
+                                    style={`background-image: url('${settings.sidebarImage ? builder.image(settings.sidebarImage).width(600).url() : "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=500"}'); background-size: cover;`}>
+                                </div>
+                                
+                                <div class="relative z-10">
+                                    <p class="text-xs text-yellow-500 font-bold uppercase tracking-widest mb-2">
+                                        {settings.sidebarSubtitle || 'Info Sekolah'}
+                                    </p>
+                                    <h3 class="text-xl text-white font-light mb-6">
+                                        {settings.sidebarTitle || 'Bergabunglah Bersama Kami'}
+                                    </h3>
+                                    <span class="inline-block px-6 py-3 border border-white/30 text-white text-xs font-bold uppercase tracking-widest group-hover:bg-white group-hover:text-black transition">
+                                        {settings.sidebarButtonText || 'Klik Disini'}
+                                    </span>
+                                </div>
+                            </a>
+                        )}
+
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        // Ambil semua tombol dengan class 'copy-btn'
+        const copyButtons = document.querySelectorAll('.copy-btn');
+
+        copyButtons.forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const url = btn.getAttribute('data-url');
+                try {
+                    // Salin ke clipboard
+                    await navigator.clipboard.writeText(url);
+                    
+                    // Beri efek visual sederhana (Alert)
+                    alert('Link berhasil disalin ke clipboard!');
+                } catch (err) {
+                    console.error('Gagal menyalin link:', err);
+                }
+            });
+        });
+    </script>
+</MainLayout>
