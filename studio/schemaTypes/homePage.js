@@ -158,7 +158,6 @@ export default defineType({
         title: 'Link Tombol Daftar',
         type: 'url'
     }),
-    // --- 10. SISWA BERPRESTASI (MARQUEE/CAROUSEL) ---
     defineField({
       name: 'achievements',
       title: 'Siswa Berprestasi (Carousel Berjalan)',
