@@ -81,86 +81,8 @@ export default defineType({
     // 6. ISI BERITA (RICH TEXT + GAMBAR + TABEL)
     defineField({
       name: 'body',
-      title: 'Isi Berita',
-      type: 'array',
-      of: [
-        // A. Blok Teks (Paragraf, Heading, Quote)
-        {
-          type: 'block',
-          // 1. STYLES
-          styles: [
-            {title: 'Normal', value: 'normal'},
-            {title: 'Heading 2', value: 'h2'},
-            {title: 'Heading 3', value: 'h3'},
-            {title: 'Heading 4', value: 'h4'},
-            {title: 'Kutipan', value: 'blockquote'},
-            {title: 'Lead (Teks Besar)', value: 'lead'},
-          ],
-          
-          // 2. LISTS
-          lists: [
-            {title: 'Bullet', value: 'bullet'}, 
-            {title: 'Number', value: 'number'}
-          ],
-
-          // 3. MARKS
-          marks: {
-            decorators: [
-              {title: 'Bold', value: 'strong'},
-              {title: 'Italic', value: 'em'},
-              {title: 'Underline', value: 'underline'},
-              {title: 'Coret (Strike)', value: 'strike-through'},
-            ],
-            annotations: [
-              {
-                title: 'URL Link',
-                name: 'link',
-                type: 'object',
-                fields: [
-                  {
-                    title: 'URL / Link Tujuan',
-                    name: 'href',
-                    type: 'url',
-                    validation: Rule => Rule.uri({
-                      scheme: ['http', 'https', 'mailto', 'tel']
-                    })
-                  },
-                  {
-                    title: 'Buka di Tab Baru?',
-                    name: 'blank',
-                    type: 'boolean',
-                    initialValue: true
-                  }
-                ]
-              }
-            ]
-          }
-        },
-        
-        // B. Blok Gambar (Sisipan di tengah teks)
-        {
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            {
-              name: 'caption',
-              type: 'string',
-              title: 'Caption Gambar (Keterangan)',
-            },
-            {
-              name: 'alt',
-              type: 'string',
-              title: 'Alternative Text',
-            }
-          ]
-        },
-
-        // C. BLOK TABEL (INI YANG BARU DITAMBAHKAN)
-        {
-          type: 'table',
-          title: 'Tabel Data'
-        }
-      ],
+      title: 'Isi Konten',
+      type: 'blockContent',
     }),
   ],
 

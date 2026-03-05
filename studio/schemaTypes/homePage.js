@@ -158,5 +158,52 @@ export default defineType({
         title: 'Link Tombol Daftar',
         type: 'url'
     }),
+    // --- 10. SISWA BERPRESTASI (MARQUEE/CAROUSEL) ---
+    defineField({
+      name: 'achievements',
+      title: 'Siswa Berprestasi (Carousel Berjalan)',
+      description: 'Daftar siswa berprestasi yang akan tampil berjalan di halaman depan.',
+      type: 'array',
+      of: [{
+          type: 'object',
+          fields: [
+              {
+                name: 'name', 
+                title: 'Nama Siswa', 
+                type: 'string',
+                validation: Rule => Rule.required()
+              },
+              {
+                name: 'achievementTitle', 
+                title: 'Prestasi (Misal: Medali Emas OSN Fisika)', 
+                type: 'string',
+                validation: Rule => Rule.required()
+              },
+              {
+                name: 'photo', 
+                title: 'Foto Siswa (Saran: Portrait/Berdiri)', 
+                type: 'image', 
+                options: { hotspot: true },
+                validation: Rule => Rule.required()
+              },
+              {
+                name: 'videoUrl', 
+                title: 'Link Video (Youtube/URL Lain)', 
+                type: 'url',
+                description: 'Video ini akan muncul sebagai pop-up saat foto siswa diklik.',
+                validation: Rule => Rule.uri({
+                  scheme: ['http', 'https']
+                })
+              }
+          ],
+          preview: {
+            select: {
+              title: 'name',
+              subtitle: 'achievementTitle',
+              media: 'photo'
+            }
+          }
+      }]
+    }),
   ]
 })
