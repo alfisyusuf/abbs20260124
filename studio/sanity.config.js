@@ -6,7 +6,7 @@ import {schemaTypes} from './schemaTypes'
 
 // Tentukan mana saja dokumen yang bersifat Singleton (hanya 1 dokumen)
 const singletonActions = new Set(["publish", "discardChanges", "restore"])
-const singletonTypes = new Set(["siteSettings", "homePage", "pageTeam"])
+const singletonTypes = new Set(["siteSettings", "navbarSettings", "footerSettings", "homePage", "pageTeam"])
 
 export default defineConfig({
   name: 'default',
@@ -20,27 +20,28 @@ export default defineConfig({
         S.list()
           .title('Menu Utama')
           .items([
-            // 1. Pengaturan Global
+            // KELOMPOK PENGATURAN GLOBAL
             S.listItem()
               .title('⚙️ Pengaturan Global')
-              .id('siteSettings')
-              .child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+              .child(
+                S.list()
+                  .title('Pengaturan Global')
+                  .items([
+                    S.listItem().title('Umum & Sosmed').id('siteSettings').child(S.document().schemaType('siteSettings').documentId('siteSettings')),
+                    S.listItem().title('Navbar Menu').id('navbarSettings').child(S.document().schemaType('navbarSettings').documentId('navbarSettings')),
+                    S.listItem().title('Footer Area').id('footerSettings').child(S.document().schemaType('footerSettings').documentId('footerSettings')),
+                  ])
+              ),
             
-            // 2. Halaman Depan
-            S.listItem()
-              .title('🏠 Halaman Depan (Home)')
-              .id('homePage')
-              .child(S.document().schemaType('homePage').documentId('homePage')),
+            S.divider(),
 
-            // 3. Halaman Tim
-            S.listItem()
-              .title('👥 Halaman: Guru & Staf')
-              .id('pageTeam')
-              .child(S.document().schemaType('pageTeam').documentId('pageTeam')),
+            // HALAMAN SINGLETON LAINNYa
+            S.listItem().title('🏠 Halaman Depan').id('homePage').child(S.document().schemaType('homePage').documentId('homePage')),
+            S.listItem().title('👥 Halaman: Guru & Staf').id('pageTeam').child(S.document().schemaType('pageTeam').documentId('pageTeam')),
 
             S.divider(),
 
-            // 4. Sisanya (Berita, Page statis, Data Guru) yang bisa ditambah banyak
+            // SISANYA (Berita, dsb)
             ...S.documentTypeListItems().filter(
               (listItem) => !singletonTypes.has(listItem.getId())
             ),

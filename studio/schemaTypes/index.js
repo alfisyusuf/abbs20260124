@@ -1,5 +1,7 @@
 import post from './post'
 import siteSettings from './siteSettings'
+import navbarSettings from './navbarSettings'
+import footerSettings from './footerSettings'
 import page from './page'
 import team from './team'
 import pageTeam from './pageTeam'
@@ -13,5 +15,7 @@ export const schemaTypes = [
     homePage,
     team,
     pageTeam,
-    siteSettings
+    siteSettings,
+    navbarSettings,
+    footerSettings 
 ]
