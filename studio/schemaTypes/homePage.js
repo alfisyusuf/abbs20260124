@@ -5,7 +5,7 @@ export default defineType({
   title: 'Halaman Depan (Home)',
   type: 'document',
   fields: [
-    // --- 1. HERO SECTION (BAGIAN ATAS) ---
+    // --- 1. HERO SECTION ---
     defineField({
       name: 'heroImage',
       title: 'Gambar Background Utama',
@@ -25,12 +25,12 @@ export default defineType({
       description: 'Link video yang muncul saat tombol Play diklik'
     }),
 
-    // --- 2. PPDB FLOAT BOX (KOTAK KANAN BAWAH) ---
+    // --- 2. PPDB FLOAT BOX ---
     defineField({
       name: 'ppdbTitle',
       title: 'Judul Kotak PPDB',
       type: 'string',
-      initialValue: 'PPDB TAHUN AJARAN 2026/2027'
+      initialValue: 'PPDB TAHUN AJARAN BARU'
     }),
     defineField({
       name: 'ppdbText',
@@ -44,7 +44,7 @@ export default defineType({
       type: 'url'
     }),
 
-    // --- 3. PRINCIPAL MESSAGE (PESAN KEPSEK) ---
+    // --- 3. PRINCIPAL MESSAGE ---
     defineField({
         name: 'principalName',
         title: 'Nama Kepala Sekolah',
@@ -62,8 +62,32 @@ export default defineType({
         type: 'text',
         rows: 4
     }),
+    defineField({
+        name: 'principalTagline',
+        title: 'Tagline Utama Kepsek (HTML/Teks)',
+        type: 'string',
+        description: 'Gunakan <span> untuk teks biasa, dan <em> untuk teks warna merah bergaris kuning. Contoh: Mendidik dengan <em>Hati <span class="font-light text-gray-900">&</span> Teknologi<svg class="absolute -bottom-1 left-0 w-full" height="6" viewBox="0 0 300 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 4 Q75 0 150 4 Q225 8 300 4" stroke="#EAB308" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg></em>'
+    }),
+    defineField({
+        name: 'schoolAge',
+        title: 'Usia Sekolah (Untuk Badge Foto Kepsek)',
+        type: 'string',
+        initialValue: '15+'
+    }),
 
-    // --- 4. KURIKULUM (3 PILLARS) ---
+    // --- 4. KURIKULUM ---
+    defineField({
+        name: 'curriculumHeader',
+        title: 'Judul Section Kurikulum',
+        type: 'string',
+        initialValue: 'Three Pillars of'
+    }),
+    defineField({
+        name: 'curriculumSubHeader',
+        title: 'Deskripsi Kecil Kurikulum',
+        type: 'string',
+        initialValue: 'Tiga fondasi pendidikan yang membentuk generasi unggul, berakhlak, dan berdaya saing global.'
+    }),
     defineField({
         name: 'curriculum',
         title: '3 Pilar Kurikulum',
@@ -74,8 +98,9 @@ export default defineType({
                 {name: 'title', title: 'Judul (Misal: ICT & IoT)', type: 'string'},
                 {name: 'desc', title: 'Deskripsi Singkat', type: 'text', rows: 2},
                 {name: 'image', title: 'Gambar Background', type: 'image'},
+                {name: 'link', title: 'Link Halaman Detail (Opsional)', type: 'string', description: 'Contoh: /program/ict'},
                 {name: 'color', title: 'Warna Aksen', type: 'string', options: {list: [
-                    {title: 'Maroon', value: 'bg-maroon/80'},
+                    {title: 'Maroon', value: 'bg-[#800000]/80'},
                     {title: 'Kuning/Gold', value: 'bg-yellow-600/80'},
                     {title: 'Hijau', value: 'bg-green-800/80'},
                     {title: 'Biru', value: 'bg-blue-800/80'},
@@ -107,7 +132,13 @@ export default defineType({
         of: [{type: 'image'}]
     }),
 
-    // --- 7. LEARNING EXPERIENCE (VIDEO GRID) ---
+    // --- 7. LEARNING EXPERIENCE ---
+    defineField({
+        name: 'videoHeader',
+        title: 'Judul Section Video',
+        type: 'string',
+        initialValue: 'Suasana Belajar'
+    }),
     defineField({
         name: 'learningVideos',
         title: 'Video Pembelajaran (Grid 3)',
@@ -141,7 +172,8 @@ export default defineType({
                 {name: 'univLogo', title: 'Logo Kampus', type: 'image'},
                 {name: 'photo', title: 'Foto Alumni', type: 'image'},
                 {name: 'quote', title: 'Kutipan', type: 'text', rows: 3},
-                {name: 'batch', title: 'Angkatan/Tahun', type: 'string'}
+                {name: 'batch', title: 'Angkatan/Tahun', type: 'string'},
+                {name: 'videoUrl', title: 'Link Video Testimoni (Opsional)', type: 'url'}
             ]
         }]
     }),
@@ -151,13 +183,21 @@ export default defineType({
         name: 'ctaTitle',
         title: 'Judul CTA Bawah',
         type: 'string',
-        initialValue: 'Mulai Perjalanan Masa Depan Bersama SMA ABBS'
+        initialValue: 'Mulai Perjalanan Masa Depan Bersama Kami'
+    }),
+    defineField({
+        name: 'ctaDesc',
+        title: 'Deskripsi CTA',
+        type: 'text',
+        rows: 3
     }),
     defineField({
         name: 'ctaLink',
         title: 'Link Tombol Daftar',
         type: 'url'
     }),
+
+    // --- 10. ACHIEVEMENTS ---
     defineField({
       name: 'achievements',
       title: 'Siswa Berprestasi (Carousel Berjalan)',
@@ -184,6 +224,11 @@ export default defineType({
                 type: 'image', 
                 options: { hotspot: true },
                 validation: Rule => Rule.required()
+              },
+              {
+                name: 'batch', 
+                title: 'Angkatan/Tahun Lulus (Opsional)', 
+                type: 'string'
               },
               {
                 name: 'videoUrl', 
