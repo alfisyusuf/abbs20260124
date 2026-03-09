@@ -13,19 +13,48 @@ export default defineType({
       options: { hotspot: true }
     }),
     defineField({
-      name: 'heroTitle',
-      title: 'Judul Besar (Excellence)',
+      name: 'heroTopLabel',
+      title: 'Label Atas (Samping Logo)',
       type: 'string',
-      initialValue: 'Excellence'
+      initialValue: 'SMA ABBS Surakarta'
+    }),
+    defineField({
+      name: 'heroOverline',
+      title: 'Teks Kecil Atas Judul',
+      type: 'string',
+      initialValue: 'Est. — Excellence in Education'
+    }),
+    defineField({
+      name: 'heroTitleTop',
+      title: 'Judul Besar (Baris Atas - Teks Solid)',
+      type: 'string',
+      initialValue: 'Wujudkan'
+    }),
+    defineField({
+      name: 'heroTitleBottom',
+      title: 'Judul Besar (Baris Bawah - Teks Transparan bergaris)',
+      type: 'string',
+      initialValue: 'Potensi'
     }),
     defineField({
       name: 'heroVideoLink',
       title: 'Link Video Profil (Youtube)',
-      type: 'url',
-      description: 'Link video yang muncul saat tombol Play diklik'
+      type: 'url'
+    }),
+    defineField({
+      name: 'heroVideoText',
+      title: 'Teks Tombol Video (Sebelah Play)',
+      type: 'string',
+      initialValue: 'Tonton Video'
     }),
 
     // --- 2. PPDB FLOAT BOX ---
+    defineField({
+      name: 'ppdbLabel',
+      title: 'Label Kecil Atas PPDB',
+      type: 'string',
+      initialValue: 'Penerimaan Siswa Baru'
+    }),
     defineField({
       name: 'ppdbTitle',
       title: 'Judul Kotak PPDB',
@@ -37,6 +66,12 @@ export default defineType({
       title: 'Teks Pendek PPDB',
       type: 'text',
       rows: 2
+    }),
+    defineField({
+      name: 'ppdbButtonText',
+      title: 'Teks Tombol Link PPDB',
+      type: 'string',
+      initialValue: 'Selengkapnya'
     }),
     defineField({
       name: 'ppdbLink',
@@ -63,10 +98,16 @@ export default defineType({
         rows: 4
     }),
     defineField({
-        name: 'principalTagline',
-        title: 'Tagline Utama Kepsek (HTML/Teks)',
+        name: 'principalTaglineTop',
+        title: 'Tagline Kepsek (Baris Atas)',
         type: 'string',
-        description: 'Gunakan <span> untuk teks biasa, dan <em> untuk teks warna merah bergaris kuning. Contoh: Mendidik dengan <em>Hati <span class="font-light text-gray-900">&</span> Teknologi<svg class="absolute -bottom-1 left-0 w-full" height="6" viewBox="0 0 300 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0 4 Q75 0 150 4 Q225 8 300 4" stroke="#EAB308" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg></em>'
+        initialValue: 'Mendidik dengan'
+    }),
+    defineField({
+        name: 'principalTaglineBottom',
+        title: 'Tagline Kepsek (Baris Bawah - Di-highlight Kuning)',
+        type: 'string',
+        initialValue: 'Hati & Teknologi'
     }),
     defineField({
         name: 'schoolAge',
@@ -98,7 +139,7 @@ export default defineType({
                 {name: 'title', title: 'Judul (Misal: ICT & IoT)', type: 'string'},
                 {name: 'desc', title: 'Deskripsi Singkat', type: 'text', rows: 2},
                 {name: 'image', title: 'Gambar Background', type: 'image'},
-                {name: 'link', title: 'Link Halaman Detail (Opsional)', type: 'string', description: 'Contoh: /program/ict'},
+                {name: 'link', title: 'Link Halaman Detail (Opsional)', type: 'string'},
                 {name: 'color', title: 'Warna Aksen', type: 'string', options: {list: [
                     {title: 'Maroon', value: 'bg-[#800000]/80'},
                     {title: 'Kuning/Gold', value: 'bg-yellow-600/80'},
@@ -201,51 +242,18 @@ export default defineType({
     defineField({
       name: 'achievements',
       title: 'Siswa Berprestasi (Carousel Berjalan)',
-      description: 'Daftar siswa berprestasi yang akan tampil berjalan di halaman depan.',
       type: 'array',
       of: [{
           type: 'object',
           fields: [
-              {
-                name: 'name', 
-                title: 'Nama Siswa', 
-                type: 'string',
-                validation: Rule => Rule.required()
-              },
-              {
-                name: 'achievementTitle', 
-                title: 'Prestasi (Misal: Medali Emas OSN Fisika)', 
-                type: 'string',
-                validation: Rule => Rule.required()
-              },
-              {
-                name: 'photo', 
-                title: 'Foto Siswa (Saran: Portrait/Berdiri)', 
-                type: 'image', 
-                options: { hotspot: true },
-                validation: Rule => Rule.required()
-              },
-              {
-                name: 'batch', 
-                title: 'Angkatan/Tahun Lulus (Opsional)', 
-                type: 'string'
-              },
-              {
-                name: 'videoUrl', 
-                title: 'Link Video (Youtube/URL Lain)', 
-                type: 'url',
-                description: 'Video ini akan muncul sebagai pop-up saat foto siswa diklik.',
-                validation: Rule => Rule.uri({
-                  scheme: ['http', 'https']
-                })
-              }
+              { name: 'name', title: 'Nama Siswa', type: 'string', validation: Rule => Rule.required() },
+              { name: 'achievementTitle', title: 'Prestasi', type: 'string', validation: Rule => Rule.required() },
+              { name: 'photo', title: 'Foto Siswa', type: 'image', options: { hotspot: true }, validation: Rule => Rule.required() },
+              { name: 'batch', title: 'Angkatan/Tahun (Opsional)', type: 'string' },
+              { name: 'videoUrl', title: 'Link Video (Opsional)', type: 'url' }
           ],
           preview: {
-            select: {
-              title: 'name',
-              subtitle: 'achievementTitle',
-              media: 'photo'
-            }
+            select: { title: 'name', subtitle: 'achievementTitle', media: 'photo' }
           }
       }]
     }),
