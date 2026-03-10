@@ -81,9 +81,21 @@ export default defineType({
 
     // --- 3. PRINCIPAL MESSAGE ---
     defineField({
+        name: 'principalOverline',
+        title: 'Label Kecil Section Kepsek',
+        type: 'string',
+        initialValue: "Principal's Message"
+    }),
+    defineField({
         name: 'principalName',
         title: 'Nama Kepala Sekolah',
         type: 'string'
+    }),
+    defineField({
+        name: 'principalRole',
+        title: 'Jabatan (Bawah Nama)',
+        type: 'string',
+        initialValue: 'Kepala Sekolah SMA ABBS'
     }),
     defineField({
         name: 'principalPhoto',
@@ -118,10 +130,22 @@ export default defineType({
 
     // --- 4. KURIKULUM ---
     defineField({
+        name: 'curriculumOverline',
+        title: 'Label Kecil Section Kurikulum',
+        type: 'string',
+        initialValue: 'Core Curriculum'
+    }),
+    defineField({
         name: 'curriculumHeader',
-        title: 'Judul Section Kurikulum',
+        title: 'Judul Section Kurikulum (Bagian Hitam)',
         type: 'string',
         initialValue: 'Three Pillars of'
+    }),
+    defineField({
+        name: 'curriculumHeaderHighlight',
+        title: 'Judul Section Kurikulum (Bagian Merah)',
+        type: 'string',
+        initialValue: 'Excellence'
     }),
     defineField({
         name: 'curriculumSubHeader',
@@ -167,6 +191,12 @@ export default defineType({
 
     // --- 6. ALUMNI LOGO ---
     defineField({
+        name: 'alumniOverline',
+        title: 'Teks Atas Logo Universitas',
+        type: 'string',
+        initialValue: 'Alumni Kami Diterima Di'
+    }),
+    defineField({
         name: 'alumniLogos',
         title: 'Logo Universitas Alumni',
         type: 'array',
@@ -175,10 +205,28 @@ export default defineType({
 
     // --- 7. LEARNING EXPERIENCE ---
     defineField({
+        name: 'videoOverline',
+        title: 'Label Kecil Section Video',
+        type: 'string',
+        initialValue: 'Learning Experience'
+    }),
+    defineField({
         name: 'videoHeader',
-        title: 'Judul Section Video',
+        title: 'Judul Section Video (Bagian Hitam)',
         type: 'string',
         initialValue: 'Suasana Belajar'
+    }),
+    defineField({
+        name: 'videoHeaderHighlight',
+        title: 'Judul Section Video (Bagian Merah)',
+        type: 'string',
+        initialValue: 'Interaktif'
+    }),
+    defineField({
+        name: 'videoYoutubeText',
+        title: 'Teks Tombol Lihat Youtube',
+        type: 'string',
+        initialValue: 'Lihat Kanal Youtube'
     }),
     defineField({
         name: 'learningVideos',
@@ -202,6 +250,18 @@ export default defineType({
 
     // --- 8. TESTIMONI ---
     defineField({
+        name: 'testimonialsOverline',
+        title: 'Label Kecil Section Testimoni',
+        type: 'string',
+        initialValue: 'Success Stories'
+    }),
+    defineField({
+        name: 'testimonialsAcceptedText',
+        title: 'Teks Pendahulu Universitas',
+        type: 'string',
+        initialValue: 'Diterima di'
+    }),
+    defineField({
         name: 'testimonials',
         title: 'Kisah Sukses Alumni',
         type: 'array',
@@ -221,6 +281,12 @@ export default defineType({
     
     // --- 9. CTA BAWAH ---
     defineField({
+        name: 'ctaOverline',
+        title: 'Label Kecil Section CTA',
+        type: 'string',
+        initialValue: 'Penerimaan Peserta Didik Baru'
+    }),
+    defineField({
         name: 'ctaTitle',
         title: 'Judul CTA Bawah',
         type: 'string',
@@ -233,12 +299,42 @@ export default defineType({
         rows: 3
     }),
     defineField({
+        name: 'ctaButtonPrimaryText',
+        title: 'Teks Tombol Daftar (Utama)',
+        type: 'string',
+        initialValue: 'Daftar Sekarang'
+    }),
+    defineField({
         name: 'ctaLink',
         title: 'Link Tombol Daftar',
         type: 'url'
     }),
+    defineField({
+        name: 'ctaButtonSecondaryText',
+        title: 'Teks Tombol Info (Kedua)',
+        type: 'string',
+        initialValue: 'Info Lengkap'
+    }),
 
     // --- 10. ACHIEVEMENTS ---
+    defineField({
+      name: 'achievementsOverline',
+      title: 'Label Kecil Section Prestasi',
+      type: 'string',
+      initialValue: 'Hall of Fame'
+    }),
+    defineField({
+      name: 'achievementsTitle',
+      title: 'Judul Prestasi (Bagian Putih)',
+      type: 'string',
+      initialValue: 'Siswa'
+    }),
+    defineField({
+      name: 'achievementsTitleHighlight',
+      title: 'Judul Prestasi (Bagian Kuning)',
+      type: 'string',
+      initialValue: 'Berprestasi'
+    }),
     defineField({
       name: 'achievements',
       title: 'Siswa Berprestasi (Carousel Berjalan)',
@@ -256,6 +352,32 @@ export default defineType({
             select: { title: 'name', subtitle: 'achievementTitle', media: 'photo' }
           }
       }]
+    }),
+
+    // --- 11. JOURNAL / NEWS LABEL ---
+    defineField({
+        name: 'journalOverline',
+        title: 'Label Kecil Section Jurnal',
+        type: 'string',
+        initialValue: 'Journal'
+    }),
+    defineField({
+        name: 'journalTitle',
+        title: 'Judul Section Jurnal (Bagian Hitam)',
+        type: 'string',
+        initialValue: 'Latest'
+    }),
+    defineField({
+        name: 'journalTitleHighlight',
+        title: 'Judul Section Jurnal (Bagian Merah)',
+        type: 'string',
+        initialValue: 'Updates'
+    }),
+    defineField({
+        name: 'journalLinkText',
+        title: 'Teks Tombol Lihat Semua',
+        type: 'string',
+        initialValue: 'Semua Berita'
     }),
   ]
 })
