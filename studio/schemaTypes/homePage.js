@@ -379,14 +379,5 @@ export default defineType({
         type: 'string',
         initialValue: 'Semua Berita'
     }),
-
-    // --- 12. SEO / SHARE SOSMED (opsional, fallback ke Deskripsi SEO global) ---
-    defineField({
-      name: 'metaDescription',
-      title: 'Deskripsi Share/SEO Homepage (opsional)',
-      type: 'text',
-      rows: 2,
-      description: 'Muncul sebagai teks preview saat homepage dibagikan ke WhatsApp/Twitter/Telegram. Kosongkan untuk pakai deskripsi SEO default.',
-    }),
   ]
 })

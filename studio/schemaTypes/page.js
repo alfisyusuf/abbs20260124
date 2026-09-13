@@ -25,21 +25,12 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
 
-    // 3. GAMBAR HERO (HEADER BESAR) — dipakai juga sebagai gambar share sosmed
+    // 3. GAMBAR HERO (HEADER BESAR)
     defineField({
       name: 'heroImage',
       title: 'Gambar Header (Background)',
       type: 'image',
       options: { hotspot: true },
-    }),
-
-    // 4. DESKRIPSI SHARE/SEO (opsional, fallback ke Deskripsi SEO global)
-    defineField({
-      name: 'metaDescription',
-      title: 'Deskripsi Share/SEO (opsional)',
-      type: 'text',
-      rows: 2,
-      description: 'Muncul sebagai teks preview saat halaman ini dibagikan ke WhatsApp/Twitter/Telegram. Kosongkan untuk pakai deskripsi SEO default.',
     }),
 
     defineField({

@@ -61,7 +61,7 @@ export default defineType({
       }
     }),
 
-    // 5. GAMBAR UTAMA (HERO IMAGE) — dipakai juga sebagai gambar share sosmed
+    // 5. GAMBAR UTAMA (HERO IMAGE)
     defineField({
       name: 'mainImage',
       title: 'Gambar Utama (Cover)',
@@ -78,16 +78,7 @@ export default defineType({
       ]
     }),
 
-    // 6. DESKRIPSI SHARE/SEO (opsional, fallback ke Deskripsi SEO global)
-    defineField({
-      name: 'metaDescription',
-      title: 'Deskripsi Share/SEO (opsional)',
-      type: 'text',
-      rows: 2,
-      description: 'Muncul sebagai teks preview saat berita ini dibagikan ke WhatsApp/Twitter/Telegram. Kosongkan untuk pakai deskripsi SEO default.',
-    }),
-
-    // 7. ISI BERITA (RICH TEXT + GAMBAR + TABEL)
+    // 6. ISI BERITA (RICH TEXT + GAMBAR + TABEL)
     defineField({
       name: 'body',
       title: 'Isi Konten',
