@@ -30,7 +30,7 @@ function formatDate(dateString) {
 }
 ---
 
-<MainLayout title="Home - SMA ABBS Surakarta">
+<MainLayout title="Home" description={home?.metaDescription} image={home?.heroImage}>
 
     <div class="relative w-full h-screen overflow-hidden">
         <img src={home?.heroImage ? urlFor(home.heroImage).url() : "https://images.unsplash.com/photo-1564981797816-1043664bf78d"} 
@@ -391,3 +391,4 @@ function formatDate(dateString) {
     </style>
 
 </MainLayout>
+

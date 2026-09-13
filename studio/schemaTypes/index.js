@@ -7,6 +7,7 @@ import team from './team'
 import pageTeam from './pageTeam'
 import homePage from './homePage'
 import blockContent from './blockContent'
+import popupAnnouncement from './popupAnnouncement'
 
 export const schemaTypes = [
     blockContent,
@@ -17,5 +18,6 @@ export const schemaTypes = [
     pageTeam,
     siteSettings,
     navbarSettings,
-    footerSettings 
+    footerSettings,
+    popupAnnouncement,
 ]

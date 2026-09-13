@@ -6,7 +6,7 @@ import {schemaTypes} from './schemaTypes'
 
 // Tentukan mana saja dokumen yang bersifat Singleton (hanya 1 dokumen)
 const singletonActions = new Set(["publish", "discardChanges", "restore"])
-const singletonTypes = new Set(["siteSettings", "navbarSettings", "footerSettings", "homePage", "pageTeam"])
+const singletonTypes = new Set(["siteSettings", "navbarSettings", "footerSettings", "homePage", "pageTeam", "popupAnnouncement"])
 
 export default defineConfig({
   name: 'default',
@@ -30,6 +30,7 @@ export default defineConfig({
                     S.listItem().title('Umum & Sosmed').id('siteSettings').child(S.document().schemaType('siteSettings').documentId('siteSettings')),
                     S.listItem().title('Navbar Menu').id('navbarSettings').child(S.document().schemaType('navbarSettings').documentId('navbarSettings')),
                     S.listItem().title('Footer Area').id('footerSettings').child(S.document().schemaType('footerSettings').documentId('footerSettings')),
+                    S.listItem().title('📢 Popup Pengumuman').id('popupAnnouncement').child(S.document().schemaType('popupAnnouncement').documentId('popupAnnouncement')),
                   ])
               ),
             

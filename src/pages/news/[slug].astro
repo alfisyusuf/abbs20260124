@@ -22,7 +22,7 @@ const { slug } = Astro.params;
 const data = await sanityClient.fetch(`{
   "post": *[_type == "post" && slug.current == $slug][0] {
     title, publishedAt, mainImage, body, category,
-    tags
+    tags, metaDescription
   },
   "settings": *[_type == "siteSettings"][0] {
     authorName, authorRole, authorImage,
@@ -92,7 +92,7 @@ const shareLinks = {
 };
 ---
 
-<MainLayout title={post.title}>
+<MainLayout title={post.title} description={post.metaDescription} image={post.mainImage} ogType="article">
     
     <div id="progress-bar" class="fixed top-0 left-0 h-1 bg-[#800000] z-[9999] w-0 transition-all duration-100"></div>
     <script>

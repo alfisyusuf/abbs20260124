@@ -21,7 +21,7 @@ function urlFor(source) {
 }
 ---
 
-<MainLayout title="Guru & Staf">
+<MainLayout title="Guru & Staf" description={page?.introText} image={page?.heroImage}>
 
     <header class="relative w-full h-[50vh] min-h-[400px] flex items-center justify-center overflow-hidden bg-[#0b0f19]">
         <img src={page?.heroImage ? urlFor(page.heroImage).url() : "https://images.unsplash.com/photo-1524178232363-1fb2b075b655"} 
@@ -121,3 +121,4 @@ function urlFor(source) {
     </style>
 
 </MainLayout>
+===== ./src/styles/global.css =====
